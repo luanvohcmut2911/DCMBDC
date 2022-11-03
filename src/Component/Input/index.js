@@ -3,15 +3,25 @@ import {Form, Button} from 'react-bootstrap';
 
 
 export const FormData = () => {
-    const [generalData, setGeneralData] = useState([]);
+    let saveSubject = []; // for saving TENDONVI, avoid duplicating
+    const [subjectData, setSubjectData] = useState([]);
+    const [majorData, setMajorData] = useState([]);
     useEffect(()=>{
-        fetch('http://localhost:3000/cautrucmonhoc')
+        const controller = new AbortController();
+        const signal = controller.signal;
+        fetch('http://localhost:4000/cautrucmonhoc', {signal})
             .then(response=>response.json())
             .then(res=>{
-                setGeneralData(res)
+                setSubjectData(res)
+            })
+        fetch('http://localhost:8000/nganh', {signal})
+            .then(response=>response.json())
+            .then(res=>{
+                setMajorData(res);
             })
     },[]);
-    console.log(generalData);
+    console.log(subjectData);
+    console.log(majorData);
     return (
         <form>
             <h3>INPUT</h3>
@@ -24,18 +34,24 @@ export const FormData = () => {
             <div className='schoolYear'>
                 <label>Khóa</label>
                 <Form.Select aria-label="Default select example">
-                    <option>Open this select menu</option>
                     <option value="21">K21</option>
                     <option value="22">K22</option>
                 </Form.Select>
             </div>
             <div className='major'>
-                <label>Khoa/ Ngành</label>
+                <label>Khoa/ Ngành</label> {/* Khoa: majorData.TENDONVI, nganh: majorData.TENCTDT  */}
                 <Form.Select aria-label="Default select example">
                     <option>Open this select menu</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
+                    {
+                        majorData.length!==0 ? majorData.map((data, index)=>{
+                            if(!saveSubject.includes(data.TENDONVI)){
+                                saveSubject.push(data.TENDONVI);
+                                return <option key={index} value = {data.MADONVI}>{data.TENDONVI}</option>
+                            }
+                            else return 0;
+                            // 
+                        }): 0
+                    }
                 </Form.Select>
             </div>
             <div className='inMajor'>
