@@ -4,8 +4,32 @@ import {Form, Button} from 'react-bootstrap';
 
 export const FormData = () => {
     let saveSubject = []; // for saving TENDONVI, avoid duplicating
+    const [majorSelected, setMajorSelected] = useState('');
     const [subjectData, setSubjectData] = useState([]);
     const [majorData, setMajorData] = useState([]);
+    const handleInMajor = () =>{
+        if(document.getElementById('majorOption').value === 'Open this select menu') {
+            setMajorSelected('');
+            alert ('Chọn khoa trước');
+        }
+        else{
+            setMajorSelected(document.getElementById('majorOption').value);
+        }
+    }
+    const handleReset = (e)=>{
+        e.preventDefault();
+        document.getElementById('majorOption').value='Open this select menu';
+        document.getElementById('inMajorOption').value='Open this select menu';
+        document.getElementById('subjectOption').value='Open this select menu';
+        document.getElementById('grade').value='';
+    }
+    const handleSubmit = (e)=>{
+        e.preventDefault();  
+        console.log(document.getElementById('majorOption').value);
+        console.log(document.getElementById('inMajorOption').value);
+        console.log(document.getElementById('subjectOption').value);
+        console.log(document.getElementById('grade').value);
+    }
     useEffect(()=>{
         const controller = new AbortController();
         const signal = controller.signal;
@@ -40,7 +64,7 @@ export const FormData = () => {
             </div>
             <div className='major'>
                 <label>Khoa/ Ngành</label> {/* Khoa: majorData.TENDONVI, nganh: majorData.TENCTDT  */}
-                <Form.Select aria-label="Default select example">
+                <Form.Select aria-label="Default select example" id='majorOption'>
                     <option>Open this select menu</option>
                     {
                         majorData.length!==0 ? majorData.map((data, index)=>{
@@ -56,36 +80,39 @@ export const FormData = () => {
             </div>
             <div className='inMajor'>
                 <label>Chuyên ngành</label>
-                <Form.Select aria-label="Default select example">
+                <Form.Select aria-label="Default select example" onClick={handleInMajor} id='inMajorOption'>
                     <option>Open this select menu</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
+                    {
+                        majorData.length!==0 ? majorData.filter((d)=>d.MADONVI===majorSelected).map((data, index)=>{
+                            return <option key={index} value = {data.MANGANH}>{data.TENCTDT} - {data.NAMAPDUNG}</option>
+                            // 
+                        }): 0
+                    }
                 </Form.Select>
             </div>
             <div className='subjectCode'>
                 <label>Mã môn học</label>
-                <Form.Select aria-label="Default select example">
+                <Form.Select aria-label="Default select example"onClick={handleInMajor} id='subjectOption'>
                     <option>Open this select menu</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
+                    {
+                        subjectData.length!==0 ? subjectData.filter((d)=>d.khoa===majorSelected).map((data, index)=>{
+                            return <option key={index} value = {data.msmh}>{data.msmh} - {data.monhoc}</option>
+                            // 
+                        }): 0
+                    }
                 </Form.Select>
             </div>
             <div className='grade'>
                 <label>Điểm tổng kết</label>
-                <Form.Select aria-label="Default select example">
-                    <option>Open this select menu</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
-                </Form.Select>
+                <Form.Text aria-label="Default select example" >
+                    <input type='text' placeholder='Nhập điểm tổng kết môn' id='grade'/>
+                </Form.Text>
             </div>
             <div className='submitButton'>
-                <Button variant="primary" type="submit">
+                <Button variant="primary" type="submit" onClick={handleSubmit}>
                     Add 1 subject
                 </Button>
-                <Button variant="primary" type="submit">
+                <Button variant="primary" type="submit" id='reset' onClick = {handleReset}>
                     Reset
                 </Button>
             </div>
